@@ -1,0 +1,91 @@
+apply plugin: 'com.android.model.application'
+
+model {
+    android {
+        // signal was an inline function until platform android-21, now it's not inline anymore.
+        // http://stackoverflow.com/questions/28740315/android-ndk-getting-java-lang-unsatisfiedlinkerror-dlopen-failed-cannot-loca?rq=1
+        // https://code.google.com/p/android/issues/detail?id=177530
+        compileSdkVersion = 21
+        buildToolsVersion = "23.0.0 rc2"
+
+        defaultConfig.with {
+            applicationId = "com.xinghui.nativedaemonprocess"
+            minSdkVersion.apiLevel = 19
+            targetSdkVersion.apiLevel = 19
+            versionCode = 1
+            versionName = "1.0"
+        }
+    }
+    /*
+     * native build settings
+     */
+    android.ndk {
+//        moduleName = "hellojni"
+
+        moduleName = "daemon"
+//        cppFlags += "-I${file("src/main/jni/daemon")}".toString()
+
+        // for logging
+//        ldLibs  += "log"
+        ldLibs += ["android", "log"]
+        stl     = "stlport_static"
+
+        // APP_PLATFORM:=android-15
+
+        /*
+         * Other ndk flags configurable here are
+         * cppFlags += "-fno-rtti"
+         * cppFlags += "-fno-exceptions"
+         * ldLibs    = ["android", "log"]
+         * stl       = "system"
+         */
+    }
+    // jni is the default dir; config this if yours is in different directory
+    android.sources {
+        main {
+            jni {
+                source {
+                    srcDirs 'src/main/jni'
+                }
+            }
+        }
+    }
+    android.productFlavors {
+        // for detailed abiFilter descriptions, refer to "Supported ABIs" @
+        // https://developer.android.com/ndk/guides/abis.html#sa
+        create("arm") {
+            ndk.abiFilters += "armeabi"
+        }
+        create("arm7") {
+            ndk.abiFilters += "armeabi-v7a"
+        }
+        create("arm8") {
+            ndk.abiFilters += "arm64-v8a"
+        }
+        create("x86") {
+            ndk.abiFilters += "x86"
+        }
+        create("x86-64") {
+            ndk.abiFilters += "x86_64"
+        }
+        create("mips") {
+            ndk.abiFilters += "mips"
+        }
+        create("mips-64") {
+            ndk.abiFilters += "mips64"
+        }
+        // To include all cpu architectures, leaves abiFilters empty
+        create("all")
+    }
+    android.buildTypes {
+        release {
+            minifyEnabled = false
+            proguardFiles += file('proguard-rules.pro')
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:22.2.1'
+}

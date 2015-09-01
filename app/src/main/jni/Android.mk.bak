@@ -1,0 +1,15 @@
+LOCAL_PATH := $(call my-dir)
+
+include $(CLEAR_VARS)
+
+LOCAL_LDLIBS := -llog
+
+LOCAL_MODULE    := daemon
+LOCAL_SRC_FILES +:= Common.h
+LOCAL_SRC_FILES +:= daemon.cpp
+LOCAL_SRC_FILES +:= daemon.h
+LOCAL_SRC_FILES +:= HelloJni.c
+
+APP_PLATFORM:=android-15
+
+include $(BUILD_SHARED_LIBRARY)
